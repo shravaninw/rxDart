@@ -114,52 +114,52 @@ Stream<int> _scanStream(List<int> a) {
   return Stream.fromIterable(a).scan((acc, curr, i) => acc + curr, 0);
 }
 
-Stream<int> _concatEagerStream(List<int> a, List<int> b) {
-  return ConcatEagerStream([
-    Stream.fromIterable(a),
-    // TimerStream(0, Duration(seconds: 10)),
-    Stream.fromIterable(b)
-  ]);
-}
+// Stream<int> _concatEagerStream(List<int> a, List<int> b) {
+//   return ConcatEagerStream([
+//     Stream.fromIterable(a),
+//     // TimerStream(0, Duration(seconds: 10)),
+//     Stream.fromIterable(b)
+//   ]);
+// }
 
-Stream<int> _deferStream(List<int> a) {
-  return DeferStream(() => Stream.value(a[3]));
-}
-
-Stream<int> _mergeStream(List<int> a, List<int> b) {
-  return MergeStream([Stream.fromIterable(a), Stream.fromIterable(b)]);
-}
-
-Stream<int> _raceStream(List<int> a, List<int> b) {
-  return RaceStream([Stream.fromIterable(a), Stream.fromIterable(b)]);
-}
+// Stream<int> _deferStream(List<int> a) {
+//   return DeferStream(() => Stream.value(a[3]));
+// }
+//
+// Stream<int> _mergeStream(List<int> a, List<int> b) {
+//   return MergeStream([Stream.fromIterable(a), Stream.fromIterable(b)]);
+// }
+//
+// Stream<int> _raceStream(List<int> a, List<int> b) {
+//   return RaceStream([Stream.fromIterable(a), Stream.fromIterable(b)]);
+// }
 
 // Stream<int> _repeatStream(int n) {
 //   return RepeatStream((int n) => Stream.value(n), 3);
+// // }
+// Stream<bool> _sequenceEqualsStream(List<int> a, List<int> b) {
+//   return Rx.sequenceEqual(Stream.fromIterable(a), Stream.fromIterable(b));
 // }
-Stream<bool> _sequenceEqualsStream(List<int> a, List<int> b) {
-  return Rx.sequenceEqual(Stream.fromIterable(a), Stream.fromIterable(b));
-}
-
-Stream _neverStream() {
-  return NeverStream();
-}
-
-Stream _forkJoinStream(List<int> a, List<int> b) {
-  return ForkJoinStream.list<int>(
-      [Stream.fromIterable(a), Stream.fromIterable(b)]);
-}
-
-Stream _bufferStream() {
-  print('Programming using buffer');
-
-  return Stream.periodic(Duration(seconds: 1), (a) => a + 1)
-      .buffer(Stream.periodic(Duration(seconds: 2), (a) => a + 1));
-}
-
-Stream _bufferCount() {
-  return RangeStream(1, 10).bufferCount(3);
-}
+//
+// Stream _neverStream() {
+//   return NeverStream();
+// }
+//
+// Stream _forkJoinStream(List<int> a, List<int> b) {
+//   return ForkJoinStream.list<int>(
+//       [Stream.fromIterable(a), Stream.fromIterable(b)]);
+// }
+//
+// Stream _bufferStream() {
+//   print('Programming using buffer');
+//
+//   return Stream.periodic(Duration(seconds: 1), (a) => a + 1)
+//       .buffer(Stream.periodic(Duration(seconds: 2), (a) => a + 1));
+// }
+//
+// Stream _bufferCount() {
+//   return RangeStream(1, 10).bufferCount(3);
+// }
 
 Stream _debounceStream(List<int> a) {
   return Stream.fromIterable(a)
