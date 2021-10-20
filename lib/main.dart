@@ -15,7 +15,21 @@ Stream<String> character(int a, int b) async* {
 }
 
 Stream<String> duplicate() {
-  List<String> a = ['1', '1', '2', '2', '1', '1', '2', '2'];
+  List<String> a = [
+    '1',
+    '1',
+    '2',
+    '2',
+    '2',
+    '2',
+    '1',
+    '1',
+    '1',
+    '2',
+    '2',
+    '2',
+    '3'
+  ];
   return Stream.fromIterable(a);
 }
 
@@ -89,12 +103,14 @@ void main() {
   _forkJoinStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('fork $event');
   });
+  _switchLatestStream(numbers(1, 5), character(1, 5)).listen((event) {
+    print('switchLatest $event');
+  });
 }
 
 Stream<String> _mapStream(
   Stream<String> a,
 ) {
-  print('Programming using map');
   return a.map((event) => event * 8);
 }
 
@@ -104,8 +120,6 @@ Stream<String> _flatMap(Stream<String> a) {
 }
 
 Stream<Object?> _combineStream(Stream<String> a, Stream<String> b) {
-  print('Programming using combineLatest');
-
   return CombineLatestStream.list<String>([
     a,
     b,
@@ -162,14 +176,14 @@ Stream _concatMapStream(Stream<String> a) {
 }
 
 Stream _distintUntilChanged(Stream<String> a) {
-  return a.scan((accumulated, value, index) {
-    if (accumulated != value) {
-      accumulated = value;
-      return value;
-    } else
-      return null;
-  }, 0).where((event) => event != null);
-  //return a.distinct();
+  // return a.scan((accumulated, value, index) {
+  //   if (accumulated != value) {
+  //     accumulated = value;
+  //     return value;
+  //   } else
+  //     return null;
+  // }, 0).where((event) => event != null);
+  return a.distinct();
 }
 
 /*
@@ -205,4 +219,15 @@ Stream _neverStream() {
 
 Stream _forkJoinStream(Stream<String> a, Stream<String> b) {
   return ForkJoinStream.list<String>([a, b]);
+}
+
+Stream _switchLatestStream(Stream<String> a, Stream<String> b) {
+  return SwitchLatestStream<String>(
+    Stream.fromIterable([
+      Rx.timer('Hi', Duration(microseconds: 10)),
+      a,
+      Stream.value('3'),
+      b,
+    ]),
+  );
 }
