@@ -2,55 +2,63 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 
-Stream<int> list(int a, int b) async* {
+Stream<String> numbers(int a, int b) async* {
   for (int i = a; i <= b; i++) {
-    yield i;
+    yield i.toString();
   }
 }
 
-void main() {
-  Stream<int> a = list(1, 5).asBroadcastStream();
-  Stream<int> b = list(6, 10).asBroadcastStream();
+Stream<String> character(int a, int b) async* {
+  for (int i = a + 64; i <= b + 64; i++) {
+    yield String.fromCharCode(i);
+  }
+}
 
-  _filterStream(a).listen((event) {
+Stream<String> duplicate() {
+  List<String> a = ['1', '1', '2', '2', '1', '1', '2', '2'];
+  return Stream.fromIterable(a);
+}
+
+void main() {
+  _filterStream(numbers(1, 5)).listen((event) {
     print('filter $event');
   });
-  _mapStream(a).listen((event) {
+  _mapStream(numbers(1, 5)).listen((event) {
     print('map $event');
   });
-  _combineStream(a, b).listen((event) {
+  _combineStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('combine $event');
   });
-  _reduceStream(a).then((value) => print('reduce $value'));
+  _reduceStream(numbers(1, 5)).then((value) => print('reduce $value'));
 
-  _concatStream(a, b).listen((event) {
+  _concatStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('concat $event');
   });
-  _zipStream(a, b).listen((event) {
+  _zipStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('zip $event');
   });
-  _flatMap(a).listen((event) {
+  _flatMap(numbers(1, 5)).listen((event) {
     print('flat $event');
   });
-  _scanStream(a).listen((event) {
+  _scanStream(numbers(1, 5)).listen((event) {
     print('scan $event');
   });
-  _debounceStream(a).listen((event) {
+  _debounceStream(numbers(1, 5)).listen((event) {
     print('debounce $event');
   });
-  _distinctStream(a).listen((event) {
+  _distinctStream(duplicate()).listen((event) {
     print('distinct $event');
   });
-  _takeUntilStream(a, b).listen((event) {
+  _takeUntilStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('take until $event');
   });
   _defaultEmpty().listen((event) {
     print('empty $event');
   });
-  _concatMapStream(a).listen((event) {
+  _concatMapStream(numbers(1, 5)).listen((event) {
     print('concatMap $event');
   });
-  _distintUntilChanged(a).listen((event) {
+  _distintUntilChanged(duplicate()).listen((event) {
     if (event != null) print('DisUnCh $event');
   });
 
@@ -61,51 +69,51 @@ void main() {
   *
    */
 
-  _concatEagerStream(a, b).listen((event) {
+  _concatEagerStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('concatEager $event');
   });
 
-  _mergeStream(a, b).listen((event) {
+  _mergeStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('merge $event');
   });
   _neverStream().listen((event) {
     print('never $event');
   });
-  _raceStream(a, b).listen((event) {
+  _raceStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('race $event');
   });
 
-  _sequenceEqualsStream(a, b).listen((event) {
+  _sequenceEqualsStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('equals $event');
   });
-  _forkJoinStream(a, b).listen((event) {
+  _forkJoinStream(numbers(1, 5), character(1, 5)).listen((event) {
     print('fork $event');
   });
 }
 
-Stream<int> _mapStream(
-  Stream<int> a,
+Stream<String> _mapStream(
+  Stream<String> a,
 ) {
   print('Programming using map');
-  return Stream.castFrom(a).map((event) => event * 8);
+  return a.map((event) => event * 8);
 }
 
-Stream<int> _flatMap(Stream<int> a) {
-  return Stream.castFrom(a).flatMap((element) =>
-      Stream.fromIterable([element, element + 1]).map((event) => event * 2));
+Stream<String> _flatMap(Stream<String> a) {
+  return a.flatMap((element) =>
+      Stream.fromIterable([element, element + 'hi']).map((event) => event * 2));
 }
 
-Stream<Object?> _combineStream(Stream<int> a, Stream<int> b) {
+Stream<Object?> _combineStream(Stream<String> a, Stream<String> b) {
   print('Programming using combineLatest');
 
-  return CombineLatestStream.list<int>([
-    Stream.castFrom(a),
-    Stream.castFrom(b),
+  return CombineLatestStream.list<String>([
+    a,
+    b,
   ]);
 }
 
-Stream<dynamic> _concatStream(Stream<int> a, Stream<int> b) {
-  return Stream.castFrom(a).concatWith([Stream.castFrom(b)]);
+Stream<dynamic> _concatStream(Stream<String> a, Stream<String> b) {
+  return a.concatWith([b]);
   // return ConcatStream([
   //   Stream.fromIterable(a),
   //   //TimerStream(0, Duration(seconds: 5)),
@@ -113,34 +121,33 @@ Stream<dynamic> _concatStream(Stream<int> a, Stream<int> b) {
   // ]);
 }
 
-Stream<int> _zipStream(Stream<int> a, Stream<int> b) {
-  return Stream.castFrom(a).zipWith(Stream.castFrom(b), (x, y) => x + y);
+Stream<String> _zipStream(Stream<String> a, Stream<String> b) {
+  return a.zipWith(b, (String a, String b) => a + b);
 }
 
-Stream _scanStream(Stream<int> a) {
-  return Stream.castFrom(a).scan((acc, curr, i) => acc + curr, 0);
+Stream<String> _scanStream(Stream<String> a) {
+  return a.scan((String acc, String curr, int i) => acc + curr, 0.toString());
 }
 
-Stream _filterStream(Stream<int> a) {
-  return Stream.castFrom(a).where((event) => event % 2 == 0);
+Stream _filterStream(Stream<String> a) {
+  return a.where((event) => int.parse(event) % 2 == 0);
 }
 
-Future _reduceStream(Stream<int> a) {
-  return Stream.castFrom(a).reduce((previous, element) => previous + element);
+Future _reduceStream(Stream<String> a) {
+  return a.reduce((previous, element) => previous + element);
 }
 
-Stream _debounceStream(Stream<int> a) {
-  return Stream.castFrom(a)
-      .debounce((_) => TimerStream(true, Duration(seconds: 1)));
+Stream _debounceStream(Stream<String> a) {
+  return a.debounce((_) => TimerStream(true, Duration(seconds: 1)));
 }
 
-Stream _distinctStream(Stream<int> a) {
-  return Stream.castFrom(a).distinct();
+Stream _distinctStream(Stream<String> a) {
+  return a.distinctUnique();
 }
 
-Stream _takeUntilStream(Stream<int> a, Stream<int> b) {
-  return Stream.castFrom(a).takeUntil(TimerStream(
-    Stream.castFrom(b),
+Stream _takeUntilStream(Stream<String> a, Stream<String> b) {
+  return a.takeUntil(TimerStream(
+    b,
     Duration(microseconds: 50),
   ));
 }
@@ -149,16 +156,20 @@ Stream _defaultEmpty() {
   return Stream.empty().defaultIfEmpty(10);
 }
 
-Stream _concatMapStream(Stream<int> a) {
-  return Stream.castFrom(a).asyncExpand((event) =>
-      Stream.fromIterable([event, event + 1]).map((events) => events * 2));
+Stream _concatMapStream(Stream<String> a) {
+  return a.asyncExpand((event) =>
+      Stream.fromIterable([event, event + 'hi']).map((events) => events * 2));
 }
 
-Stream _distintUntilChanged(Stream<int> a) {
-  return Stream.castFrom(a).scan((accumulated, value, index) {
-    accumulated ??= a.elementAt(index - 1);
-    return accumulated != value ? value : null;
-  }, 0);
+Stream _distintUntilChanged(Stream<String> a) {
+  return a.scan((accumulated, value, index) {
+    if (accumulated != value) {
+      accumulated = value;
+      return value;
+    } else
+      return null;
+  }, 0).where((event) => event != null);
+  //return a.distinct();
 }
 
 /*
@@ -168,30 +179,30 @@ Stream _distintUntilChanged(Stream<int> a) {
 *
  */
 
-Stream<int> _concatEagerStream(Stream<int> a, Stream<int> b) {
+Stream<String> _concatEagerStream(Stream<String> a, Stream<String> b) {
   return ConcatEagerStream([
-    Stream.castFrom(a),
+    a,
     // TimerStream(0, Duration(seconds: 10)),
-    Stream.castFrom(b)
+    b
   ]);
 }
 
-Stream<int> _mergeStream(Stream<int> a, Stream<int> b) {
-  return MergeStream([Stream.castFrom(a), Stream.castFrom(b)]);
+Stream<String> _mergeStream(Stream<String> a, Stream<String> b) {
+  return MergeStream([a, b]);
 }
 
-Stream<int> _raceStream(Stream<int> a, Stream<int> b) {
-  return RaceStream([Stream.castFrom(a), Stream.castFrom(b)]);
+Stream<String> _raceStream(Stream<String> a, Stream<String> b) {
+  return RaceStream([a, b]);
 }
 
-Stream<bool> _sequenceEqualsStream(Stream<int> a, Stream<int> b) {
-  return Rx.sequenceEqual(Stream.castFrom(a), Stream.castFrom(b));
+Stream<bool> _sequenceEqualsStream(Stream<String> a, Stream<String> b) {
+  return Rx.sequenceEqual(a, b);
 }
 
 Stream _neverStream() {
   return NeverStream();
 }
 
-Stream _forkJoinStream(Stream<int> a, Stream<int> b) {
-  return ForkJoinStream.list<int>([Stream.castFrom(a), Stream.castFrom(b)]);
+Stream _forkJoinStream(Stream<String> a, Stream<String> b) {
+  return ForkJoinStream.list<String>([a, b]);
 }
