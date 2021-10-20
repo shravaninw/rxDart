@@ -11,11 +11,17 @@ void main() {
     5,
   ];
   List<int> b = [6, 7, 8, 9, 10];
+  _filterStream(a).listen((event) {
+    print('filter $event');
+  });
   _mapStream(a).listen((event) {
     print('map $event');
   });
   _combineStream(a, b).listen((event) {
     print('combine $event');
+  });
+  _reduceStream(a).listen((event) {
+    print('reduce $event');
   });
 
   //
@@ -72,6 +78,9 @@ void main() {
   });
   _defaultEmpty().listen((event) {
     print('empty $event');
+  });
+  _concatMapStream(a).listen((event) {
+    print('concatMap $event');
   });
 }
 
@@ -160,6 +169,15 @@ Stream<int> _scanStream(List<int> a) {
 // Stream _bufferCount() {
 //   return RangeStream(1, 10).bufferCount(3);
 // }
+Stream _filterStream(List<int> a) {
+  return Stream.fromIterable(a).where((event) => event % 2 == 0);
+}
+
+Stream _reduceStream(List<int> a) {
+  return Stream.fromIterable(a)
+      .reduce((previous, element) => previous + element)
+      .asStream();
+}
 
 Stream _debounceStream(List<int> a) {
   return Stream.fromIterable(a)
@@ -179,4 +197,9 @@ Stream _takeUntilStream(List<int> a, List<int> b) {
 
 Stream _defaultEmpty() {
   return Stream.empty().defaultIfEmpty(10);
+}
+
+Stream _concatMapStream(List<int> a) {
+  return Stream.fromIterable(a).asyncExpand((event) =>
+      Stream.fromIterable([event, event + 1]).map((events) => events * 2));
 }
