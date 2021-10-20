@@ -6,9 +6,9 @@ void main() {
   List<int> a = [
     1,
     2,
+    2,
+    1,
     3,
-    4,
-    5,
   ];
   List<int> b = [6, 7, 8, 9, 10];
   _filterStream(a).listen((event) {
@@ -81,6 +81,9 @@ void main() {
   });
   _concatMapStream(a).listen((event) {
     print('concatMap $event');
+  });
+  _distintUntilChanged(a).listen((event) {
+    if (event != null) print('DisUnCh $event');
   });
 }
 
@@ -202,4 +205,9 @@ Stream _defaultEmpty() {
 Stream _concatMapStream(List<int> a) {
   return Stream.fromIterable(a).asyncExpand((event) =>
       Stream.fromIterable([event, event + 1]).map((events) => events * 2));
+}
+
+Stream _distintUntilChanged(List<int> a) {
+  return Stream.fromIterable(a).scan(
+      (accumulated, value, index) => accumulated != value ? value : null, 0);
 }
