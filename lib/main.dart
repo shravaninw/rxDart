@@ -1,115 +1,182 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:rxdart/rxdart.dart';
 
 void main() {
-  runApp(const MyApp());
+  List<int> a = [
+    1,
+    2,
+    3,
+    4,
+    5,
+  ];
+  List<int> b = [6, 7, 8, 9, 10];
+  _mapStream(a).listen((event) {
+    print('map $event');
+  });
+  _combineStream(a, b).listen((event) {
+    print('combine $event');
+  });
+
+  //
+  // _bufferStream().listen((event) {
+  //   print('buffer $event');
+  // });
+  // _bufferCount().listen((event) {
+  //   print('bufCount $event');
+  // });
+  _concatStream(a, b).listen((event) {
+    print('concat $event');
+  });
+  _zipStream(a, b).listen((event) {
+    print('zip $event');
+  });
+  // _concatEagerStream(a, b).listen((event) {
+  //   print('concatEager $event');
+  // });
+  // _deferStream(a).listen((event) {
+  //   print('defer $event');
+  // });
+  // _mergeStream(a, b).listen((event) {
+  //   print('merge $event');
+  // });
+  // _neverStream().listen((event) {
+  //   print('never $event');
+  // });
+  // _raceStream(a, b).listen((event) {
+  //   print('race $event');
+  // });
+  // // _repeatStream(5).listen((event) {
+  // //   print('repeat $event');
+  // // });
+  // _sequenceEqualsStream(a, b).listen((event) {
+  //   print('equals $event');
+  // });
+  // _forkJoinStream(a, b).listen((event) {
+  //   print('fork $event');
+  // });
+  _flatMap(a).listen((event) {
+    print('flat $event');
+  });
+  _scanStream(a).listen((event) {
+    print('scan $event');
+  });
+  _debounceStream(a).listen((event) {
+    print('debounce $event');
+  });
+  _distinctStream(a).listen((event) {
+    print('distinct $event');
+  });
+  _takeUntilStream(a, b).listen((event) {
+    print('take until $event');
+  });
+  _defaultEmpty().listen((event) {
+    print('empty $event');
+  });
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
+Stream<int> _mapStream(
+  List<int> a,
+) {
+  print('Programming using map');
+  return Stream.fromIterable(a).map((event) => event * 8);
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
+Stream<int> _flatMap(List<int> a) {
+  return Stream.fromIterable(a).flatMap((element) =>
+      Stream.fromIterable([element, element + 1]).map((event) => event * 2));
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+Stream<Object?> _combineStream(List<int> a, List<int> b) {
+  print('Programming using combineLatest');
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  return CombineLatestStream.list<int>([
+    Stream.fromIterable(a),
+    Stream.fromIterable(b),
+  ]);
+}
 
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+Stream<int> _concatStream(List<int> a, List<int> b) {
+  return Stream.fromIterable(a).concatWith([Stream.fromIterable(b)]);
+  // return ConcatStream([
+  //   Stream.fromIterable(a),
+  //   //TimerStream(0, Duration(seconds: 5)),
+  //   Stream.fromIterable(b)
+  // ]);
+}
+
+Stream<int> _zipStream(List<int> a, List<int> b) {
+  return Stream.fromIterable(a)
+      .zipWith(Stream.fromIterable(b), (int x, int y) => x + y);
+}
+
+Stream<int> _scanStream(List<int> a) {
+  return Stream.fromIterable(a).scan((acc, curr, i) => acc + curr, 0);
+}
+
+Stream<int> _concatEagerStream(List<int> a, List<int> b) {
+  return ConcatEagerStream([
+    Stream.fromIterable(a),
+    // TimerStream(0, Duration(seconds: 10)),
+    Stream.fromIterable(b)
+  ]);
+}
+
+Stream<int> _deferStream(List<int> a) {
+  return DeferStream(() => Stream.value(a[3]));
+}
+
+Stream<int> _mergeStream(List<int> a, List<int> b) {
+  return MergeStream([Stream.fromIterable(a), Stream.fromIterable(b)]);
+}
+
+Stream<int> _raceStream(List<int> a, List<int> b) {
+  return RaceStream([Stream.fromIterable(a), Stream.fromIterable(b)]);
+}
+
+// Stream<int> _repeatStream(int n) {
+//   return RepeatStream((int n) => Stream.value(n), 3);
+// }
+Stream<bool> _sequenceEqualsStream(List<int> a, List<int> b) {
+  return Rx.sequenceEqual(Stream.fromIterable(a), Stream.fromIterable(b));
+}
+
+Stream _neverStream() {
+  return NeverStream();
+}
+
+Stream _forkJoinStream(List<int> a, List<int> b) {
+  return ForkJoinStream.list<int>(
+      [Stream.fromIterable(a), Stream.fromIterable(b)]);
+}
+
+Stream _bufferStream() {
+  print('Programming using buffer');
+
+  return Stream.periodic(Duration(seconds: 1), (a) => a + 1)
+      .buffer(Stream.periodic(Duration(seconds: 2), (a) => a + 1));
+}
+
+Stream _bufferCount() {
+  return RangeStream(1, 10).bufferCount(3);
+}
+
+Stream _debounceStream(List<int> a) {
+  return Stream.fromIterable(a)
+      .debounce((_) => TimerStream(true, Duration(seconds: 1)));
+}
+
+Stream _distinctStream(List<int> a) {
+  return Stream.fromIterable(a).distinct();
+}
+
+Stream _takeUntilStream(List<int> a, List<int> b) {
+  return Stream.fromIterable(a).takeUntil(TimerStream(
+    Stream.fromIterable(b),
+    Duration(microseconds: 50),
+  ));
+}
+
+Stream _defaultEmpty() {
+  return Stream.empty().defaultIfEmpty(10);
 }
