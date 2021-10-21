@@ -34,78 +34,82 @@ Stream<String> duplicate() {
 }
 
 void main() {
-  _filterStream(numbers(1, 5)).listen((event) {
-    print('filter $event');
-  });
-  _mapStream(numbers(1, 5)).listen((event) {
-    print('map $event');
-  });
-  _combineStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('combine $event');
-  });
-  _reduceStream(numbers(1, 5)).then((value) => print('reduce $value'));
-
-  _concatStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('concat $event');
-  });
-  _zipStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('zip $event');
-  });
-  _flatMap(numbers(1, 5)).listen((event) {
+  // _filterStream(numbers(1, 5)).listen((event) {
+  //   print('filter $event');
+  // });
+  // _mapStream(numbers(1, 5)).listen((event) {
+  //   print('map $event');
+  // });
+  // _combineStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('combine $event');
+  // });
+  // _reduceStream(numbers(1, 5)).then((value) => print('reduce $value'));
+  //
+  // _concatStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('concat $event');
+  // });
+  // _zipStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('zip $event');
+  // });
+  _flatMap(numbers(1, 5).asBroadcastStream(),
+          character(1, 5).asBroadcastStream())
+      .listen((event) {
     print('flat $event');
   });
-  _scanStream(numbers(1, 5)).listen((event) {
-    print('scan $event');
-  });
-  _debounceStream(numbers(1, 5)).listen((event) {
-    print('debounce $event');
-  });
-  _distinctStream(duplicate()).listen((event) {
-    print('distinct $event');
-  });
-  _takeUntilStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('take until $event');
-  });
-  _defaultEmpty().listen((event) {
-    print('empty $event');
-  });
-  _concatMapStream(numbers(1, 5)).listen((event) {
+  // _scanStream(numbers(1, 5)).listen((event) {
+  //   print('scan $event');
+  // });
+  // _debounceStream(numbers(1, 5)).listen((event) {
+  //   print('debounce $event');
+  // });
+  // _distinctStream(duplicate()).listen((event) {
+  //   print('distinct $event');
+  // });
+  // _takeUntilStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('take until $event');
+  // });
+  // _defaultEmpty().listen((event) {
+  //   print('empty $event');
+  // });
+  _concatMapStream(numbers(1, 5).asBroadcastStream(),
+          character(1, 5).asBroadcastStream())
+      .listen((event) {
     print('concatMap $event');
   });
-  _distintUntilChanged(duplicate()).listen((event) {
-    if (event != null) print('DisUnCh $event');
-  });
-
-  /*
-  *
-  *
-  *
-  *
-   */
-
-  _concatEagerStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('concatEager $event');
-  });
-
-  _mergeStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('merge $event');
-  });
-  _neverStream().listen((event) {
-    print('never $event');
-  });
-  _raceStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('race $event');
-  });
-
-  _sequenceEqualsStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('equals $event');
-  });
-  _forkJoinStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('fork $event');
-  });
-  _switchLatestStream(numbers(1, 5), character(1, 5)).listen((event) {
-    print('switchLatest $event');
-  });
+  // _distintUntilChanged(duplicate()).listen((event) {
+  //   if (event != null) print('DisUnCh $event');
+  // });
+  //
+  // /*
+  // *
+  // *
+  // *
+  // *
+  //  */
+  //
+  // _concatEagerStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('concatEager $event');
+  // });
+  //
+  // _mergeStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('merge $event');
+  // });
+  // _neverStream().listen((event) {
+  //   print('never $event');
+  // });
+  // _raceStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('race $event');
+  // });
+  //
+  // _sequenceEqualsStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('equals $event');
+  // });
+  // _forkJoinStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('fork $event');
+  // });
+  // _switchLatestStream(numbers(1, 5), character(1, 5)).listen((event) {
+  //   print('switchLatest $event');
+  // });
 }
 
 Stream<String> _mapStream(
@@ -114,9 +118,8 @@ Stream<String> _mapStream(
   return a.map((event) => event * 8);
 }
 
-Stream<String> _flatMap(Stream<String> a) {
-  return a.flatMap((element) =>
-      Stream.fromIterable([element, element + 'hi']).map((event) => event * 2));
+Stream<String> _flatMap(Stream<String> a, Stream<String> b) {
+  return a.flatMap((element) => b.map((event) => element + event));
 }
 
 Stream<Object?> _combineStream(Stream<String> a, Stream<String> b) {
@@ -170,9 +173,8 @@ Stream _defaultEmpty() {
   return Stream.empty().defaultIfEmpty(10);
 }
 
-Stream _concatMapStream(Stream<String> a) {
-  return a.asyncExpand((event) =>
-      Stream.fromIterable([event, event + 'hi']).map((events) => events * 2));
+Stream _concatMapStream(Stream<String> a, Stream<String> b) {
+  return a.asyncExpand((event) => b.map((events) => event + events));
 }
 
 Stream _distintUntilChanged(Stream<String> a) {
